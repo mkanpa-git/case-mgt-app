@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a small case management example built with Next.js. It exposes API routes for managing cases, tasks and comments and a simple React interface.
 
 ## Getting Started
 
@@ -12,6 +12,12 @@ yarn dev
 pnpm dev
 # or
 bun dev
+```
+
+To run the Jest test suite:
+
+```bash
+npm test
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
