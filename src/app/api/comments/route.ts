@@ -6,7 +6,11 @@ import { v4 as uuid } from 'uuid';
 export function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const caseId = searchParams.get('caseId');
-  const result = caseId ? comments.filter(c => c.caseId === caseId) : comments;
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
+  let result = caseId ? comments.filter(c => c.caseId === caseId) : comments;
+  const start = (page - 1) * pageSize;
+  result = result.slice(start, start + pageSize);
   return NextResponse.json(result);
 }
 
