@@ -27,13 +27,42 @@ export default function Home() {
   return (
     <div>
       <div className="mb-4 flex gap-2">
-        <input className="border p-2 flex-1" value={title} onChange={e => setTitle(e.target.value)} placeholder="New case title" />
-        <button className="bg-blue-600 text-white px-4" onClick={createCase}>Add</button>
+        <input
+          className="border p-2 flex-1"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder="New case title"
+        />
+        <button
+          className="bg-blue-600 text-white px-4 disabled:opacity-50"
+          onClick={createCase}
+          disabled={!title.trim()}
+        >
+          Add
+        </button>
       </div>
       <ul className="space-y-2">
         {cases.map(c => (
           <li key={c.id} className="p-2 border rounded flex justify-between">
-            <span>{c.title} - {c.status}</span>
+            <span>
+              {c.title} -
+              <span
+                className={
+                  c.status === 'Closed'
+                    ? 'text-gray-600'
+                    : c.status === 'In Progress'
+                    ? 'text-yellow-600'
+                    : 'text-green-600'
+                }
+              >
+                {c.status}
+              </span>
+              {c.dueDate && (
+                <span className="ml-2 text-sm text-gray-500">
+                  (due {new Date(c.dueDate).toLocaleDateString()})
+                </span>
+              )}
+            </span>
             <Link href={`/case/${c.id}`} className="text-blue-600">View</Link>
           </li>
         ))}

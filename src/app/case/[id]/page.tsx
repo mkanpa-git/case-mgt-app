@@ -1,7 +1,7 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { Case, Task, Comment } from '@/types/entities';
+import { Case, Task, Comment, CaseStatus } from '@/types/entities';
 
 export default function CaseDetail() {
   const params = useParams();
@@ -12,7 +12,25 @@ export default function CaseDetail() {
   const [taskTitle, setTaskTitle] = useState('');
   const [commentMsg, setCommentMsg] = useState('');
 
-  async function load() {
+  async function updateStatus(status: CaseStatus) {
+    await fetch(`/api/cases/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    load();
+  }
+
+  async function toggleTask(task: Task) {
+    await fetch(`/api/tasks/${task.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ completed: !task.completed }),
+    });
+    load();
+  }
+
+  const load = useCallback(async () => {
     const [cRes, tRes, cmRes] = await Promise.all([
       fetch(`/api/cases/${id}`),
       fetch(`/api/tasks?caseId=${id}`),
@@ -21,9 +39,11 @@ export default function CaseDetail() {
     setCaseData(await cRes.json());
     setTasks(await tRes.json());
     setComments(await cmRes.json());
-  }
+  }, [id]);
 
-  useEffect(() => { load(); }, [id]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function addTask() {
     await fetch('/api/tasks', {
@@ -50,24 +70,67 @@ export default function CaseDetail() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">{caseData.title}</h2>
-      <p>Status: {caseData.status}</p>
+      <div className="flex items-center gap-2">
+        <span>Status:</span>
+        <select
+          className="border p-1"
+          value={caseData.status}
+          onChange={e => updateStatus(e.target.value as CaseStatus)}
+        >
+          <option value="Open">Open</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      {caseData.dueDate && (
+        <p>Due: {new Date(caseData.dueDate).toLocaleDateString()}</p>
+      )}
 
       <div>
         <h3 className="font-medium">Tasks</h3>
         <div className="flex gap-2 my-2">
-          <input className="border p-1 flex-1" value={taskTitle} onChange={e => setTaskTitle(e.target.value)} />
-          <button className="bg-blue-600 text-white px-2" onClick={addTask}>Add</button>
+          <input
+            className="border p-1 flex-1"
+            value={taskTitle}
+            onChange={e => setTaskTitle(e.target.value)}
+          />
+          <button
+            className="bg-blue-600 text-white px-2 disabled:opacity-50"
+            onClick={addTask}
+            disabled={!taskTitle.trim()}
+          >
+            Add
+          </button>
         </div>
         <ul className="list-disc pl-4">
-          {tasks.map(t => <li key={t.id}>{t.title}</li>)}
+          {tasks.map(t => (
+            <li key={t.id} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={t.completed}
+                onChange={() => toggleTask(t)}
+              />
+              <span className={t.completed ? 'line-through' : ''}>{t.title}</span>
+            </li>
+          ))}
         </ul>
       </div>
 
       <div>
         <h3 className="font-medium">Comments</h3>
         <div className="flex gap-2 my-2">
-          <input className="border p-1 flex-1" value={commentMsg} onChange={e => setCommentMsg(e.target.value)} />
-          <button className="bg-blue-600 text-white px-2" onClick={addComment}>Add</button>
+          <input
+            className="border p-1 flex-1"
+            value={commentMsg}
+            onChange={e => setCommentMsg(e.target.value)}
+          />
+          <button
+            className="bg-blue-600 text-white px-2 disabled:opacity-50"
+            onClick={addComment}
+            disabled={!commentMsg.trim()}
+          >
+            Add
+          </button>
         </div>
         <ul className="list-disc pl-4">
           {comments.map(c => <li key={c.id}>{c.message}</li>)}
