@@ -14,9 +14,12 @@ export async function POST(request: Request) {
   const body = (await request.json()) as Partial<Case>;
   const newCase: Case = {
     id: uuid(),
-    title: body.title ?? 'Untitled',
+    subject: body.subject ?? 'Untitled',
     description: body.description ?? '',
-    status: 'Open',
+    status: 'New',
+    priority: body.priority,
+    accountId: body.accountId,
+    contactId: body.contactId,
     createdAt: new Date().toISOString(),
     assigneeId: body.assigneeId,
     dueDate: body.dueDate,

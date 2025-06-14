@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function Home() {
   const [cases, setCases] = useState<Case[]>([]);
-  const [title, setTitle] = useState('');
+  const [subject, setSubject] = useState('');
 
   async function loadCases() {
     const res = await fetch('/api/cases');
@@ -18,9 +18,9 @@ export default function Home() {
     await fetch('/api/cases', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify({ subject }),
     });
-    setTitle('');
+    setSubject('');
     loadCases();
   }
 
@@ -29,14 +29,14 @@ export default function Home() {
       <div className="mb-4 flex gap-2">
         <input
           className="border p-2 flex-1"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          placeholder="New case title"
+          value={subject}
+          onChange={e => setSubject(e.target.value)}
+          placeholder="New case subject"
         />
         <button
           className="bg-blue-600 text-white px-4 disabled:opacity-50"
           onClick={createCase}
-          disabled={!title.trim()}
+          disabled={!subject.trim()}
         >
           Add
         </button>
@@ -45,12 +45,12 @@ export default function Home() {
         {cases.map(c => (
           <li key={c.id} className="p-2 border rounded flex justify-between">
             <span>
-              {c.title} -
+              {c.subject} -
               <span
                 className={
                   c.status === 'Closed'
                     ? 'text-gray-600'
-                    : c.status === 'In Progress'
+                    : c.status === 'Working'
                     ? 'text-yellow-600'
                     : 'text-green-600'
                 }

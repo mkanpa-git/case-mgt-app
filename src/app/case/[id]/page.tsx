@@ -69,7 +69,7 @@ export default function CaseDetail() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">{caseData.title}</h2>
+      <h2 className="text-xl font-semibold">{caseData.subject}</h2>
       <div className="flex items-center gap-2">
         <span>Status:</span>
         <select
@@ -77,8 +77,8 @@ export default function CaseDetail() {
           value={caseData.status}
           onChange={e => updateStatus(e.target.value as CaseStatus)}
         >
-          <option value="Open">Open</option>
-          <option value="In Progress">In Progress</option>
+          <option value="New">New</option>
+          <option value="Working">Working</option>
           <option value="Closed">Closed</option>
         </select>
       </div>
